@@ -12,6 +12,8 @@ import { CurrencyCode } from '@/core/config'
 import { BreadcrumbsLayout } from '@/components/layout'
 import { NotFound } from '@/components/error'
 
+import { Datepicker } from '@/components/datepicker'
+
 import type { BikeRentDetails } from '@/core/api/modules/typings/bike'
 // import { bike } from '@/core/api'
 
@@ -28,7 +30,8 @@ export default defineComponent({
     BookingPricing,
     BikeBookmark,
     NotFound,
-    ImageLazy
+    ImageLazy,
+    Datepicker
   },
   metaInfo() {
     const { name } = this.data || {}
@@ -44,16 +47,20 @@ export default defineComponent({
     isBookmarked: false,
     // STEP_1: Create a date object to hold the start and end dates
     date: {
-      start: '2024-01-13',
-      end: '2024-01-16'
+      start: '2024-01-15',
+      end: '2024-01-18'
+    },
+    dateN: {
+      start: null,
+      end: null
     },
     loading: false,
     rentCompleted: false,
     // TO_REMOVE: These are mock dates to be used during the development
     mockDates: {
       one: {
-        start: '2024-01-13',
-        end: '2024-01-16'
+        start: '2024-01-15',
+        end: '2024-01-18'
       },
       two: {
         start: '2024-02-10',
@@ -209,22 +216,32 @@ export default defineComponent({
                 </div>
               </div>
             </template>
-            <template v-else>
-              <h3 class="text-base mb-4">Booking Overview</h3>
+            <div v-else>
+              <section class="">
+                <h3 class="text-2xl font-extrabold mb-2">Select date and time</h3>
 
-              <!-- TO_REMOVE: This is a date change mock - replace with the real calendar -->
-              <button @click="date = mockDates.one">Mock three days</button>
-              <button @click="date = mockDates.two">Mock ten days</button>
+                <div class="">
+                  <datepicker v-model:date="dateN" />
+                  {{ dateN }}
+                  <!-- TO_REMOVE: This is a date change mock - replace with the real calendar -->
+                  <button @click="date = mockDates.one">Mock three days</button>
+                  <button @click="date = mockDates.two">Mock ten days</button>
+                </div>
+              </section>
 
-              <div class="divider" />
+              <section class="mt-5">
+                <h3 class="text-base mb-4">Booking Overview</h3>
 
-              <booking-pricing :currency="currency" :details="rentDetails" class="mb-8" @updated="loading = false" />
+                <div class="divider" />
 
-              <button class="button button--primary w-full py-5" :disabled="loading" @click="handleAddBooking">
-                <loading-spinner v-if="loading" />
-                <template v-else>Add to booking</template>
-              </button>
-            </template>
+                <booking-pricing :currency="currency" :details="rentDetails" class="mb-8" @updated="loading = false" />
+
+                <button class="button button--primary w-full py-5" :disabled="loading" @click="handleAddBooking">
+                  <loading-spinner v-if="loading" />
+                  <template v-else>Add to booking</template>
+                </button>
+              </section>
+            </div>
           </div>
         </div>
       </div>
