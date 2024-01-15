@@ -2,6 +2,7 @@
 import { useBikeStore, mapActions, mapState } from '@/core/store'
 import { defineComponent } from 'vue'
 import axios from 'axios'
+import { API_USER_ID } from '@/core/config'
 
 import { LoadingSpinner } from '@/components/loading'
 import { BikeImageSelector, BikeSpecs, type BikeSpecsProps, BikePrice, BikeBookmark } from '@/components/bike'
@@ -82,7 +83,7 @@ export default defineComponent({
     rentDetails(): BikeRentDetails {
       return {
         bikeId: this.id!, // We can use the non-null assertion operator because if the id is null, the rentDetails will not be used by the component
-        userId: 603, // TODO: Get this from the API
+        userId: API_USER_ID, // TODO: Get this from the API when we have the login screen implemented
         dateFrom: this.date.start,
         dateTo: this.date.end
       }

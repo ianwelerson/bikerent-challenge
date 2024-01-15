@@ -1,5 +1,6 @@
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue'
+import axios from 'axios'
 import { Icon } from '@/components/icon/'
 import { formatCurrency } from '@/core/helpers/currency'
 import { bike } from '@/core/api'
@@ -20,7 +21,7 @@ export default defineComponent({
       required: true
     }
   },
-  emits: ['updated'],
+  emits: ['updated', 'error'],
   data: () => ({
     subtotal: 0,
     serviceFee: 0,
@@ -39,12 +40,19 @@ export default defineComponent({
       return formatCurrency(value, this.currency)
     },
     async updatePrice() {
-      const { rentAmount, fee, totalAmount } = await bike.amount(this.details)
+      try {
+        const { rentAmount, fee, totalAmount } = await bike.amount(this.details)
 
-      this.subtotal = rentAmount
-      this.serviceFee = fee
-      this.total = totalAmount
-      this.$emit('updated')
+        this.subtotal = rentAmount
+        this.serviceFee = fee
+        this.total = totalAmount
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          this.$emit('error', error.response?.data.message)
+        }
+      } finally {
+        this.$emit('updated')
+      }
     }
   }
 })
