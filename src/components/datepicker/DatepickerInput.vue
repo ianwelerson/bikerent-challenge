@@ -237,7 +237,6 @@ export default defineComponent({
   &__days {
     @apply .mt-5;
 
-    margin-left: -10px;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -245,7 +244,8 @@ export default defineComponent({
 }
 
 .weekday {
-  flex: 1;
+  width: calc(100% / 7);
+  text-align: center;
 
   &__label {
     @apply .m-0, .font-bold, .text-base;

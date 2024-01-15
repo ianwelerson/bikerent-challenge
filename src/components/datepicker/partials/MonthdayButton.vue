@@ -28,23 +28,23 @@ export default defineComponent({
   },
   emits: ['select'],
   computed: {
-    isPastDate() {
+    isPastDate(): boolean {
       const today = new Date()
       today.setHours(0, 0, 0, 0)
 
       return this.dateParse(this.day) < today
     },
-    disablePastDate() {
+    disablePastDate(): boolean {
       return !this.allowPast && this.isPastDate
     },
     classList(): string[] {
       const classList: string[] = []
-      const date = this.dateParse(this.day)
+      const buttonDate = this.dateParse(this.day)
 
       // --- Base Classes
 
       // Different month
-      if (date.getMonth() + 1 !== Number(this.currentMonth)) {
+      if (buttonDate.getMonth() + 1 !== Number(this.currentMonth)) {
         classList.push('monthday--diff-month')
       }
 
@@ -53,32 +53,40 @@ export default defineComponent({
         classList.push('monthday--disabled')
       }
 
-      // Do not apply styles if both dates are null
+      // Return base classes if there's no start and end
       if (!this.selected.start && !this.selected.end) {
         return classList
       }
 
-      // --- Active classes
-      const startDate = this.selected.start ? this.dateParse(this.selected.start) : null
-      const endDate = this.selected.end ? this.dateParse(this.selected.end) : null
+      // --- Interaction classes
 
-      // Start date
-      if (startDate && date.getTime() === startDate.getTime()) {
+      const selectedStart = this.selected.start ? this.dateParse(this.selected.start) : null
+      const selectedDate = this.selected.end ? this.dateParse(this.selected.end) : null
+      const isStartDate = selectedStart && buttonDate.getTime() === selectedStart.getTime()
+      const isBetween =
+        selectedStart &&
+        buttonDate.getTime() > selectedStart.getTime() &&
+        selectedDate &&
+        buttonDate.getTime() < selectedDate.getTime()
+      const isEndDate = selectedDate && buttonDate.getTime() === selectedDate.getTime()
+
+      // Start date - base
+      if (isStartDate) {
         classList.push('monthday--start')
+      }
 
-        // Start date - only start selected
-        if (this.selected.start && !this.selected.end) {
-          classList.push('monthday--start-only')
-        }
+      // Start date - only start selected
+      if (isStartDate && !this.selected.end) {
+        classList.push('monthday--start-only')
       }
 
       // End date
-      if (endDate && date.getTime() === endDate.getTime()) {
+      if (isEndDate) {
         classList.push('monthday--end')
       }
 
       // Between dates
-      if (startDate && endDate && date.getTime() > startDate.getTime() && date.getTime() < endDate.getTime()) {
+      if (isBetween) {
         classList.push('monthday--between')
       }
 
@@ -107,7 +115,7 @@ export default defineComponent({
 <style scoped lang="scss">
 .monthday {
   width: calc(100% / 7);
-  height: 40px;
+  aspect-ratio: 1 / 1;
   box-sizing: border-box;
   outline: none;
   background: transparent;
