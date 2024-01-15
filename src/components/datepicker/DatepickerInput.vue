@@ -36,7 +36,8 @@ export default defineComponent({
     selected: {
       start: null,
       end: null
-    } as SelectedDates
+    } as SelectedDates,
+    currentWidth: window.innerWidth
   }),
   computed: {
     days() {
@@ -51,20 +52,33 @@ export default defineComponent({
       }
 
       return this.month <= new Date().getMonth() + 1
+    },
+    isMobile(): boolean {
+      return this.currentWidth <= 1024
     }
   },
   watch: {
     selected: {
-      handler(newDates) {
-        if (!!newDates.start && !!newDates.end) {
-          this.$emit('update:modelValue', Object.assign({}, newDates))
+      handler() {
+        // If is mobile, we will not do an autoapply
+        if (this.isMobile) {
+          return
         }
+
+        this.emitDate()
       },
       deep: true
     }
   },
   mounted() {
-    this.selected = this.modelValue
+    this.selected = { ...this.modelValue }
+
+    this.$nextTick(() => {
+      window.addEventListener('resize', this.onResize)
+    })
+  },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.onResize)
   },
   methods: {
     navigate(direction: 'PREV' | 'NEXT') {
@@ -98,6 +112,14 @@ export default defineComponent({
       }
 
       this.selected.end = date
+    },
+    onResize() {
+      this.currentWidth = window.innerWidth
+    },
+    emitDate() {
+      if (!!this.selected.start && !!this.selected.end) {
+        this.$emit('update:modelValue', { ...this.selected })
+      }
     }
   }
 })
@@ -165,6 +187,9 @@ export default defineComponent({
             />
           </div>
         </div>
+      </div>
+      <div v-if="isMobile" class="mt-16">
+        <button class="button button--secondary w-full py-5" @click="emitDate">Select</button>
       </div>
     </div>
   </div>
