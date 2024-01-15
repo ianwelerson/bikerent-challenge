@@ -1,0 +1,51 @@
+// Vitest Snapshot v1
+
+exports[`DatepickerInput > renders correctly 1`] = `
+"<div class=\\"datepicker\\" data-v-b40e904a=\\"\\">
+  <div class=\\"datepicker__wrapper\\" data-v-b40e904a=\\"\\">
+    <div class=\\"datepicker__header\\" data-v-b40e904a=\\"\\">
+      <div class=\\"current-month\\" data-v-b40e904a=\\"\\">
+        <h3 class=\\"current-month__label\\" data-v-b40e904a=\\"\\">January</h3>
+        <p class=\\"current-month__year\\" data-v-b40e904a=\\"\\">2024</p>
+      </div>
+      <div class=\\"navigation\\" data-v-b40e904a=\\"\\"><button class=\\"navigation__button navigation__button--disabled\\" disabled=\\"\\" data-v-b40e904a=\\"\\">
+          <div class=\\"navigation__icon\\" data-v-b40e904a=\\"\\">
+            <div class=\\"icon text-2xl\\" data-v-6ea13f32=\\"\\" data-v-b40e904a=\\"\\"><em class=\\"fa-solid fa-chevron-left\\" data-v-6ea13f32=\\"\\"></em></div>
+          </div>
+        </button><button class=\\"navigation__button\\" data-v-b40e904a=\\"\\">
+          <div class=\\"navigation__icon\\" data-v-b40e904a=\\"\\">
+            <div class=\\"icon text-2xl\\" data-v-6ea13f32=\\"\\" data-v-b40e904a=\\"\\"><em class=\\"fa-solid fa-chevron-right\\" data-v-6ea13f32=\\"\\"></em></div>
+          </div>
+        </button></div>
+    </div>
+    <div class=\\"datepicker__calendar\\" data-v-b40e904a=\\"\\">
+      <div class=\\"calendar\\" data-v-b40e904a=\\"\\">
+        <div class=\\"calendar__header\\" data-v-b40e904a=\\"\\">
+          <div class=\\"weekday\\" data-v-b40e904a=\\"\\">
+            <p class=\\"weekday__label\\" data-v-b40e904a=\\"\\">Su</p>
+          </div>
+          <div class=\\"weekday\\" data-v-b40e904a=\\"\\">
+            <p class=\\"weekday__label\\" data-v-b40e904a=\\"\\">Mo</p>
+          </div>
+          <div class=\\"weekday\\" data-v-b40e904a=\\"\\">
+            <p class=\\"weekday__label\\" data-v-b40e904a=\\"\\">Tu</p>
+          </div>
+          <div class=\\"weekday\\" data-v-b40e904a=\\"\\">
+            <p class=\\"weekday__label\\" data-v-b40e904a=\\"\\">We</p>
+          </div>
+          <div class=\\"weekday\\" data-v-b40e904a=\\"\\">
+            <p class=\\"weekday__label\\" data-v-b40e904a=\\"\\">Th</p>
+          </div>
+          <div class=\\"weekday\\" data-v-b40e904a=\\"\\">
+            <p class=\\"weekday__label\\" data-v-b40e904a=\\"\\">Fr</p>
+          </div>
+          <div class=\\"weekday\\" data-v-b40e904a=\\"\\">
+            <p class=\\"weekday__label\\" data-v-b40e904a=\\"\\">Sa</p>
+          </div>
+        </div>
+        <div class=\\"calendar__days\\" data-v-b40e904a=\\"\\"><button class=\\"monthday monthday--diff-month monthday--disabled\\" disabled=\\"\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">31</span></button><button class=\\"monthday monthday--disabled\\" disabled=\\"\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">01</span></button><button class=\\"monthday monthday--disabled\\" disabled=\\"\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">02</span></button><button class=\\"monthday monthday--disabled\\" disabled=\\"\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">03</span></button><button class=\\"monthday monthday--disabled\\" disabled=\\"\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">04</span></button><button class=\\"monthday monthday--disabled\\" disabled=\\"\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">05</span></button><button class=\\"monthday monthday--disabled\\" disabled=\\"\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">06</span></button><button class=\\"monthday monthday--disabled\\" disabled=\\"\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">07</span></button><button class=\\"monthday monthday--disabled\\" disabled=\\"\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">08</span></button><button class=\\"monthday monthday--disabled\\" disabled=\\"\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">09</span></button><button class=\\"monthday monthday--disabled\\" disabled=\\"\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">10</span></button><button class=\\"monthday monthday--disabled\\" disabled=\\"\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">11</span></button><button class=\\"monthday monthday--disabled\\" disabled=\\"\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">12</span></button><button class=\\"monthday monthday--disabled\\" disabled=\\"\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">13</span></button><button class=\\"monthday\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">14</span></button><button class=\\"monthday monthday--start\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">15</span></button><button class=\\"monthday monthday--between\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">16</span></button><button class=\\"monthday monthday--between\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">17</span></button><button class=\\"monthday monthday--between\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">18</span></button><button class=\\"monthday monthday--between\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">19</span></button><button class=\\"monthday monthday--end\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">20</span></button><button class=\\"monthday\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">21</span></button><button class=\\"monthday\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">22</span></button><button class=\\"monthday\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">23</span></button><button class=\\"monthday\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">24</span></button><button class=\\"monthday\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">25</span></button><button class=\\"monthday\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">26</span></button><button class=\\"monthday\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">27</span></button><button class=\\"monthday\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">28</span></button><button class=\\"monthday\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">29</span></button><button class=\\"monthday\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">30</span></button><button class=\\"monthday\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">31</span></button><button class=\\"monthday monthday--diff-month\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">01</span></button><button class=\\"monthday monthday--diff-month\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">02</span></button><button class=\\"monthday monthday--diff-month\\" data-v-06bf3248=\\"\\" data-v-b40e904a=\\"\\"><span class=\\"monthday__label\\" data-v-06bf3248=\\"\\">03</span></button></div>
+      </div>
+    </div>
+  </div>
+</div>"
+`;
