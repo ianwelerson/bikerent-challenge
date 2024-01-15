@@ -20,6 +20,10 @@ export default defineComponent({
     selected: {
       type: Object as PropType<SelectedDates>,
       required: true
+    },
+    allowPast: {
+      type: Boolean,
+      required: true
     }
   },
   emits: ['select'],
@@ -29,6 +33,9 @@ export default defineComponent({
       today.setHours(0, 0, 0, 0)
 
       return this.dateParse(this.day) < today
+    },
+    disablePastDate() {
+      return !this.allowPast && this.isPastDate
     },
     classList(): string[] {
       const classList: string[] = []
@@ -42,7 +49,7 @@ export default defineComponent({
       }
 
       // Past date
-      if (this.isPastDate) {
+      if (this.disablePastDate) {
         classList.push('monthday--disabled')
       }
 
@@ -92,7 +99,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <button :class="['monthday', classList]" :disabled="isPastDate" @click="selectDay">
+  <button :class="['monthday', classList]" :disabled="disablePastDate" @click="selectDay">
     <span class="monthday__label">{{ formatDate(day, 'DD') }}</span>
   </button>
 </template>

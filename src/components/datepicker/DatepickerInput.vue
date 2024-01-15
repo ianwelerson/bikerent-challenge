@@ -160,6 +160,7 @@ export default defineComponent({
               :current-month="month"
               :day="day"
               :selected="selected"
+              :allow-past="allowPastDate"
               @select="setDate"
             />
           </div>
