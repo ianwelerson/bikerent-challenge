@@ -1,0 +1,16 @@
+// Vitest Snapshot v1
+
+exports[`BookingPricing > renders correctly 1`] = `
+"<section class=\\"booking-pricing\\" data-v-c7ba2ef4=\\"\\">
+  <div class=\\"grid grid-cols-2 gap-y-3 text-sm\\" data-v-c7ba2ef4=\\"\\">
+    <div class=\\"flex items-center\\" data-v-c7ba2ef4=\\"\\"> Subtotal <div class=\\"icon text-xs ml-1\\" data-v-6ea13f32=\\"\\" data-v-c7ba2ef4=\\"\\"><em class=\\"fa-solid fa-circle-info\\" data-v-6ea13f32=\\"\\"></em></div>
+    </div>
+    <div class=\\"text-right\\" data-v-c7ba2ef4=\\"\\">0 €</div>
+    <div class=\\"flex items-center\\" data-v-c7ba2ef4=\\"\\"> Service Fee <div class=\\"icon text-xs ml-1\\" data-v-6ea13f32=\\"\\" data-v-c7ba2ef4=\\"\\"><em class=\\"fa-solid fa-circle-info\\" data-v-6ea13f32=\\"\\"></em></div>
+    </div>
+    <div class=\\"text-right\\" data-v-c7ba2ef4=\\"\\">0 €</div>
+    <div class=\\"flex items-center text-base\\" data-v-c7ba2ef4=\\"\\">Total</div>
+    <div class=\\"text-right text-2xl font-bold\\" data-v-c7ba2ef4=\\"\\">0 €</div>
+  </div>
+</section>"
+`;
