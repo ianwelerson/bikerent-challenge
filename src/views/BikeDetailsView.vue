@@ -1,6 +1,7 @@
 <script lang="ts">
 import { useBikeStore, mapActions, mapState } from '@/core/store'
 import { defineComponent } from 'vue'
+import axios from 'axios'
 
 import { LoadingSpinner } from '@/components/loading'
 import { BikeImageSelector, BikeSpecs, type BikeSpecsProps, BikePrice, BikeBookmark } from '@/components/bike'
@@ -12,10 +13,10 @@ import { CurrencyCode } from '@/core/config'
 import { BreadcrumbsLayout } from '@/components/layout'
 import { NotFound } from '@/components/error'
 
-import { Datepicker } from '@/components/datepicker'
+import { DatepickerInput } from '@/components/datepicker'
 
 import type { BikeRentDetails } from '@/core/api/modules/typings/bike'
-// import { bike } from '@/core/api'
+import { bike } from '@/core/api'
 
 export default defineComponent({
   name: 'BikeDetailsView',
@@ -31,7 +32,7 @@ export default defineComponent({
     BikeBookmark,
     NotFound,
     ImageLazy,
-    Datepicker
+    DatepickerInput
   },
   metaInfo() {
     const { name } = this.data || {}
@@ -45,28 +46,13 @@ export default defineComponent({
     currency: CurrencyCode.EUR,
     mockAddress: '745 Atlantic Ave, Boston, MA 02111, United States',
     isBookmarked: false,
-    // STEP_1: Create a date object to hold the start and end dates
     date: {
-      start: '2024-01-15',
-      end: '2024-01-18'
-    },
-    dateN: {
-      start: null,
-      end: null
+      start: new Date().toISOString().split('T')[0],
+      end: new Date().toISOString().split('T')[0]
     },
     loading: false,
     rentCompleted: false,
-    // TO_REMOVE: These are mock dates to be used during the development
-    mockDates: {
-      one: {
-        start: '2024-01-15',
-        end: '2024-01-18'
-      },
-      two: {
-        start: '2024-02-10',
-        end: '2024-02-20'
-      }
-    }
+    error: null as string | null
   }),
   computed: {
     ...mapState(useBikeStore, ['getBikeById']),
@@ -93,7 +79,6 @@ export default defineComponent({
         ratings
       }
     },
-    // STEP_2: Create a computed to hold the bike rent details
     rentDetails(): BikeRentDetails {
       return {
         bikeId: this.id!, // We can use the non-null assertion operator because if the id is null, the rentDetails will not be used by the component
@@ -106,6 +91,7 @@ export default defineComponent({
   watch: {
     date() {
       this.loading = true
+      this.error = null
     }
   },
   async beforeMount() {
@@ -121,20 +107,18 @@ export default defineComponent({
       this.loading = true
 
       try {
-        // TODO: Remove mock and use the real API - Using mock to avoid hit the API
-        // await bike.amount(this.rentDetails)
-        await new Promise<void>((resolve) => {
-          setTimeout(() => {
-            resolve()
-          }, 2000)
-        })
-
+        await bike.rent(this.rentDetails)
         this.rentCompleted = true
       } catch (error) {
-        //
+        if (axios.isAxiosError(error)) {
+          this.errorHandle(error.response?.data.message)
+        }
       } finally {
         this.loading = false
       }
+    },
+    errorHandle(message: string | null) {
+      this.error = message
     }
   }
 })
@@ -221,11 +205,7 @@ export default defineComponent({
                 <h3 class="text-2xl font-extrabold mb-2">Select date and time</h3>
 
                 <div class="">
-                  <datepicker v-model:date="dateN" />
-                  {{ dateN }}
-                  <!-- TO_REMOVE: This is a date change mock - replace with the real calendar -->
-                  <button @click="date = mockDates.one">Mock three days</button>
-                  <button @click="date = mockDates.two">Mock ten days</button>
+                  <datepicker-input v-model="date" />
                 </div>
               </section>
 
@@ -234,10 +214,21 @@ export default defineComponent({
 
                 <div class="divider" />
 
-                <booking-pricing :currency="currency" :details="rentDetails" class="mb-8" @updated="loading = false" />
+                <booking-pricing
+                  :currency="currency"
+                  :details="rentDetails"
+                  class="mb-8"
+                  @updated="loading = false"
+                  @error="errorHandle"
+                />
 
-                <button class="button button--primary w-full py-5" :disabled="loading" @click="handleAddBooking">
+                <button
+                  :class="['button button--primary w-full py-5', { 'btn-disabled': loading || !!error }]"
+                  :disabled="loading || !!error"
+                  @click="handleAddBooking"
+                >
                   <loading-spinner v-if="loading" />
+                  <div v-else-if="!!error" class="rent-summary__error">{{ error }}</div>
                   <template v-else>Add to booking</template>
                 </button>
               </section>
@@ -267,5 +258,13 @@ export default defineComponent({
   &__img {
     width: 185px;
   }
+
+  &__error {
+    color: get-theme-color('error');
+  }
+}
+
+.btn-disabled {
+  cursor: not-allowed;
 }
 </style>

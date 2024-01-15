@@ -1,135 +1,103 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
+import type { PropType } from 'vue'
+
+import type { SelectedDates } from './types'
+
+import { generateDatepickerDays } from '@/core/helpers/date'
 
 import { Icon } from '@/components/icon'
+import { MonthdayButton } from '@/components/datepicker/partials'
 
 export default defineComponent({
   name: 'DatepickerInput',
   components: {
-    Icon
+    Icon,
+    MonthdayButton
   },
-  emits: ['update:date'],
-  data: () => ({
-    month: 'March',
-    year: 2022,
-    days: [
-      '2023-12-31',
-      '2024-01-01',
-      '2024-01-02',
-      '2024-01-03',
-      '2024-01-04',
-      '2024-01-05',
-      '2024-01-06',
-      '2024-01-07',
-      '2024-01-08',
-      '2024-01-09',
-      '2024-01-10',
-      '2024-01-11',
-      '2024-01-12',
-      '2024-01-13',
-      '2024-01-14',
-      '2024-01-15',
-      '2024-01-16',
-      '2024-01-17',
-      '2024-01-18',
-      '2024-01-19',
-      '2024-01-20',
-      '2024-01-21',
-      '2024-01-22',
-      '2024-01-23',
-      '2024-01-24',
-      '2024-01-25',
-      '2024-01-26',
-      '2024-01-27',
-      '2024-01-28',
-      '2024-01-29',
-      '2024-01-30',
-      '2024-01-31',
-      '2024-02-01',
-      '2024-02-02',
-      '2024-02-03'
-    ],
-    allowPrev: false,
-    allowNext: true,
-    date: {
-      start: null as string | null,
-      end: null as string | null
+  props: {
+    modelValue: {
+      type: Object as PropType<SelectedDates>,
+      required: true
+    },
+    allowSingleDay: {
+      type: Boolean,
+      default: true
+    },
+    allowPastDate: {
+      type: Boolean,
+      default: false
     }
+  },
+  emits: ['update:modelValue'],
+  data: () => ({
+    month: new Date().getMonth() + 1,
+    year: new Date().getFullYear(),
+    selected: {
+      start: null,
+      end: null
+    } as SelectedDates
   }),
+  computed: {
+    days() {
+      return generateDatepickerDays(this.year, this.month, 35)
+    },
+    monthName() {
+      return new Date(this.year, this.month, 0).toLocaleString('en-US', { month: 'long' })
+    },
+    disablePrevAction(): boolean {
+      if (this.allowPastDate) {
+        return false
+      }
+
+      return this.month <= new Date().getMonth() + 1
+    }
+  },
   watch: {
-    date: {
+    selected: {
       handler(newDates) {
         if (!!newDates.start && !!newDates.end) {
-          this.$emit('update:date', Object.assign({}, newDates))
+          this.$emit('update:modelValue', Object.assign({}, newDates))
         }
       },
       deep: true
     }
   },
+  mounted() {
+    this.selected = this.modelValue
+  },
   methods: {
     navigate(direction: 'PREV' | 'NEXT') {
-      /* eslint-disable no-console */
-      console.log(direction)
+      if (direction === 'PREV') {
+        this.year = this.month === 1 ? this.year - 1 : this.year
+        this.month = this.month > 1 ? this.month - 1 : 12
+        return
+      }
+
+      this.year = this.month === 12 ? this.year + 1 : this.year
+      this.month = this.month < 12 ? this.month + 1 : 1
     },
     setDate(date: string) {
       // Set start date
-      if (!this.date.start || !!this.date.end) {
-        this.date.start = date
-        this.date.end = null
+      if (!this.selected.start || !!this.selected.end) {
+        this.selected.start = date
+        this.selected.end = null
         return
       }
 
       // Switch dates if the end date is before the start
-      if (date < this.date.start) {
-        this.date.end = this.date.start
-        this.date.start = date
+      if (date < this.selected.start) {
+        this.selected.end = this.selected.start
+        this.selected.start = date
         return
       }
 
-      // Clear dates
-      if (!this.date.end && date === this.date.start) {
-        this.date.end = null
-        this.date.start = null
+      // Single day
+      if (!this.allowSingleDay && date === this.selected.start) {
         return
       }
 
-      this.date.end = date
-    },
-    monthdayClassList(dateString: string): string[] {
-      const classList: string[] = []
-      const date = new Date(dateString)
-
-      if (!this.date.start && !this.date.end) {
-        return classList
-      }
-
-      const startDate = this.date.start ? new Date(this.date.start) : null
-      const endDate = this.date.end ? new Date(this.date.end) : null
-
-      // Start date
-      if (startDate && date.getTime() === startDate.getTime()) {
-        classList.push('monthday--start')
-      }
-
-      // Start date - remove light bg
-      if (this.date.start && !this.date.end) {
-        classList.push('monthday--start-no-bg')
-      }
-
-      // End date
-      if (endDate && date.getTime() === endDate.getTime()) {
-        classList.push('monthday--end')
-      }
-
-      // Between dates
-      if (startDate && endDate && date >= startDate && date <= endDate) {
-        classList.push('monthday--between')
-      }
-
-      return classList
-    },
-    formatDay(dateString: string) {
-      return dateString.split('-')[2]
+      this.selected.end = date
     }
   }
 })
@@ -140,24 +108,20 @@ export default defineComponent({
     <div class="datepicker__wrapper">
       <div class="datepicker__header">
         <div class="current-month">
-          <h3 class="current-month__label">{{ month }}</h3>
+          <h3 class="current-month__label">{{ monthName }}</h3>
           <p class="current-month__year">{{ year }}</p>
         </div>
         <div class="navigation">
           <button
-            :class="['navigation__button', { 'navigation__button--allowed': allowPrev }]"
-            :disabled="!allowPrev"
+            :class="['navigation__button', { 'navigation__button--disabled': disablePrevAction }]"
+            :disabled="disablePrevAction"
             @click="navigate('PREV')"
           >
             <div class="navigation__icon">
               <icon type="solid" size="2xl">chevron-left</icon>
             </div>
           </button>
-          <button
-            :class="['navigation__button', { 'navigation__button--allowed': allowNext }]"
-            :disabled="!allowNext"
-            @click="navigate('NEXT')"
-          >
+          <button class="navigation__button" @click="navigate('NEXT')">
             <div class="navigation__icon">
               <icon type="solid" size="2xl">chevron-right</icon>
             </div>
@@ -190,9 +154,14 @@ export default defineComponent({
             </div>
           </div>
           <div class="calendar__days">
-            <button v-for="day in days" :key="day" :class="['monthday', monthdayClassList(day)]" @click="setDate(day)">
-              <span class="monthday__label">{{ formatDay(day) }}</span>
-            </button>
+            <monthday-button
+              v-for="day in days"
+              :key="day"
+              :current-month="month"
+              :day="day"
+              :selected="selected"
+              @select="setDate"
+            />
           </div>
         </div>
       </div>
@@ -240,12 +209,11 @@ export default defineComponent({
     background: transparent;
     border: 1px solid get-theme-color('white');
     border-radius: $border-radius-lg;
-    opacity: 0.5;
-    cursor: not-allowed;
+    cursor: pointer;
 
-    &--allowed {
-      cursor: pointer;
-      opacity: 1;
+    &--disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
   }
 
@@ -282,72 +250,6 @@ export default defineComponent({
     @apply .m-0, .font-bold, .text-base;
 
     opacity: 0.5;
-  }
-}
-
-.monthday {
-  width: calc(100% / 7);
-  height: 40px;
-  box-sizing: border-box;
-  outline: none;
-  background: transparent;
-  border: solid 1px transparent;
-  color: get-theme-color('white');
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  &:not(:nth-last-child(-n + 7)) {
-    margin-bottom: 2px;
-  }
-
-  &:not(&--disabled) {
-    cursor: pointer;
-  }
-
-  &:hover:not(.monthday--start, .monthday--end, .monthday--between) {
-    border-color: get-theme-color('white');
-    border-radius: 100%;
-  }
-
-  &--between {
-    background: #c1cff24d; // on-primary with 30% of opacity
-  }
-
-  &--start,
-  &--end {
-    background: #c1cff24d; // on-primary with 30% of opacity
-    padding: 0;
-    border: 0;
-
-    .monthday__label {
-      background: get-theme-color('white');
-      color: get-theme-color('primary');
-      border-radius: 100%;
-    }
-  }
-
-  &--start {
-    border-radius: 100% 0 0 100%;
-
-    &-no-bg {
-      background: transparent;
-    }
-  }
-
-  &--end {
-    border-radius: 0 100% 100% 0;
-  }
-
-  &__label {
-    @apply .font-semibold, .text-base;
-
-    line-height: 1;
-    height: 100%;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
   }
 }
 </style>
