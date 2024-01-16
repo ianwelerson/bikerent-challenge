@@ -42,6 +42,7 @@ export default defineComponent({
   position: relative;
   border: 1px solid get-theme-color('gray');
   border-radius: $border-radius-lg;
+  background-color: get-theme-color('background');
 
   @include element('spec') {
     @apply .h-full, .text-base;

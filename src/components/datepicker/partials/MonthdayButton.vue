@@ -190,5 +190,11 @@ export default defineComponent({
     justify-content: center;
     align-items: center;
   }
+
+  &--between#{&}--diff-month {
+    .monthday__label {
+      opacity: 0.4;
+    }
+  }
 }
 </style>

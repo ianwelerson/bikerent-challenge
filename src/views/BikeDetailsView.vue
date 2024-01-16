@@ -4,6 +4,8 @@ import { defineComponent } from 'vue'
 import axios from 'axios'
 import { API_USER_ID } from '@/core/config'
 
+import { useScreenSize } from '@/composables'
+
 import { LoadingSpinner } from '@/components/loading'
 import { BikeImageSelector, BikeSpecs, type BikeSpecsProps, BikePrice, BikeBookmark } from '@/components/bike'
 import { Chip } from '@/components/chip'
@@ -15,6 +17,7 @@ import { BreadcrumbsLayout } from '@/components/layout'
 import { NotFound } from '@/components/error'
 
 import { DatepickerInput } from '@/components/datepicker'
+import { SwipeModal } from '@/components/swipeModal'
 
 import type { BikeRentDetails } from '@/core/api/modules/typings/bike'
 import { bike } from '@/core/api'
@@ -33,7 +36,8 @@ export default defineComponent({
     BikeBookmark,
     NotFound,
     ImageLazy,
-    DatepickerInput
+    DatepickerInput,
+    SwipeModal
   },
   metaInfo() {
     const { name } = this.data || {}
@@ -53,7 +57,8 @@ export default defineComponent({
     },
     loading: false,
     rentCompleted: false,
-    error: null as string | null
+    error: null as string | null,
+    screenSize: useScreenSize()
   }),
   computed: {
     ...mapState(useBikeStore, ['getBikeById']),
@@ -87,6 +92,9 @@ export default defineComponent({
         dateFrom: this.date.start,
         dateTo: this.date.end
       }
+    },
+    contentWrapperComponent() {
+      return this.screenSize.isMobile ? 'swipe-modal' : 'div'
     }
   },
   watch: {
@@ -120,13 +128,16 @@ export default defineComponent({
     },
     errorHandle(message: string | null) {
       this.error = message
+    },
+    backHome() {
+      this.$router.push({ name: 'home' })
     }
   }
 })
 </script>
 
 <template>
-  <div v-if="hasData" class="absolute top-0 left-0 pl-2">
+  <div v-if="hasData && !screenSize.isMobile" class="absolute top-0 left-0 pl-2">
     <breadcrumbs-layout theme="primary" :breadcrumbs="[{ name: data!.name }]" />
   </div>
 
@@ -140,103 +151,116 @@ export default defineComponent({
       <not-found />
     </template>
     <template v-else>
-      <div class="grid gap-x-6 grid-cols-1">
-        <div>
-          <div class="card p-8">
-            <bike-image-selector :images="images" class="mb-8" />
+      <component :is="contentWrapperComponent" color-scheme="white" @close="backHome">
+        <div class="grid gap-x-6 grid-cols-1">
+          <div>
+            <div :class="['p-8', { card: !screenSize.isMobile }]">
+              <bike-image-selector :images="images" class="mb-8" />
 
-            <bike-specs :specs="specs" />
+              <div :class="['bike-details', { 'bike-details--mobile': screenSize.isMobile }]">
+                <bike-specs :specs="specs" />
 
-            <div class="divider" />
+                <div v-if="!screenSize.isMobile" class="divider" />
 
-            <article>
-              <div class="flex">
-                <div>
-                  <h2 class="font-extrabold text-4xl">{{ data!.name }}</h2>
-                  <chip color="secondary" size="sm">{{ data!.type }}</chip>
+                <article class="bike-details__descrtiption relative">
+                  <div class="flex">
+                    <div>
+                      <h2 class="font-extrabold text-2xl mb-1 lg:mb-0 lg:text-4xl">{{ data!.name }}</h2>
+                      <chip color="secondary" size="sm">{{ data!.type }}</chip>
+                    </div>
+
+                    <div v-if="!screenSize.isMobile" class="ml-auto">
+                      <bike-bookmark v-model:active="isBookmarked" :width="60" size="2xl" outlined />
+                    </div>
+                  </div>
+
+                  <p>{{ data!.description }}</p>
+                </article>
+
+                <section class="bike-details__pricing relative">
+                  <div class="divider" />
+                  <div class="flex">
+                    <div class="font-semibold">Day</div>
+                    <bike-price :price="data!.rate" :currency="currency" rate="daily" class="ml-auto" />
+                  </div>
+                  <div class="flex">
+                    <div class="font-semibold">Week</div>
+                    <bike-price :price="data!.rate * 7" :currency="currency" rate="weekly" class="ml-auto" />
+                  </div>
+                  <div class="divider" />
+                </section>
+
+                <div class="bike-details__location w-full relative">
+                  <h4 class="text-base lg:text-2xl font-extrabold mb-4">Full adress after booking</h4>
+                  <booking-address-map :address="mockAddress" />
                 </div>
-
-                <div class="ml-auto">
-                  <bike-bookmark v-model:active="isBookmarked" :width="60" size="2xl" outlined />
-                </div>
               </div>
-
-              <p>{{ data!.description }}</p>
-            </article>
-
-            <section class="pricing">
-              <div class="divider" />
-              <div class="flex">
-                <div class="font-semibold">Day</div>
-                <bike-price :price="data!.rate" :currency="currency" rate="daily" class="ml-auto" />
-              </div>
-              <div class="flex">
-                <div class="font-semibold">Week</div>
-                <bike-price :price="data!.rate * 7" :currency="currency" rate="weekly" class="ml-auto" />
-              </div>
-              <div class="divider" />
-            </section>
-
-            <div class="w-full">
-              <h4 class="text-2xl font-extrabold mb-4">Full adress after booking</h4>
-              <booking-address-map :address="mockAddress" />
             </div>
           </div>
-        </div>
 
-        <div>
-          <div class="card p-8">
-            <template v-if="rentCompleted">
-              <div class="rent-summary">
-                <div>
-                  <h3 class="mb-6 text-2xl font-extrabold">Thank you!</h3>
-                  <p class="m-0 text-base font-semibold">Your bike is booked.</p>
-                </div>
-                <div class="mt-6">
-                  <image-lazy :src="images[0]" class="rent-summary__img" />
-                  <div class="mt-4">
-                    <h2 class="text-lg font-bold">{{ data!.name }}</h2>
-                    <chip color="secondary" size="sm">{{ data!.type }}</chip>
+          <div v-if="screenSize.isMobile" class="rent-action">
+            <div class="rent-action__content">
+              <bike-bookmark v-model:active="isBookmarked" :width="60" size="2xl" outlined />
+              <router-link :to="{ name: 'booking', params: { id } }" class="button button--secondary w-full py-5 ml-2"
+                >Rent Bike</router-link
+              >
+            </div>
+          </div>
+
+          <div v-if="!screenSize.isMobile">
+            <div class="card p-8">
+              <template v-if="rentCompleted">
+                <div class="rent-summary">
+                  <div>
+                    <h3 class="mb-6 text-2xl font-extrabold">Thank you!</h3>
+                    <p class="m-0 text-base font-semibold">Your bike is booked.</p>
+                  </div>
+                  <div class="mt-6">
+                    <image-lazy :src="images[0]" class="rent-summary__img" />
+                    <div class="mt-4">
+                      <h2 class="text-lg font-bold">{{ data!.name }}</h2>
+                      <chip color="secondary" size="sm">{{ data!.type }}</chip>
+                    </div>
                   </div>
                 </div>
+              </template>
+              <div v-else>
+                <section class="">
+                  <h3 class="text-2xl font-extrabold mb-2">Select date and time</h3>
+
+                  <div class="">
+                    <datepicker-input v-model="date" />
+                  </div>
+                </section>
+
+                <section class="mt-5">
+                  <h3 class="text-base mb-4">Booking Overview</h3>
+
+                  <div class="divider" />
+
+                  <booking-pricing
+                    :currency="currency"
+                    :details="rentDetails"
+                    class="mb-8"
+                    @updated="loading = false"
+                    @error="errorHandle"
+                  />
+
+                  <button
+                    :class="['button button--primary w-full py-5', { 'btn-disabled': loading || !!error }]"
+                    :disabled="loading || !!error"
+                    @click="handleAddBooking"
+                  >
+                    <loading-spinner v-if="loading" />
+                    <div v-else-if="!!error" class="rent-summary__error">{{ error }}</div>
+                    <template v-else>Add to booking</template>
+                  </button>
+                </section>
               </div>
-            </template>
-            <div v-else>
-              <section class="">
-                <h3 class="text-2xl font-extrabold mb-2">Select date and time</h3>
-
-                <div class="">
-                  <datepicker-input v-model="date" />
-                </div>
-              </section>
-
-              <section class="mt-5">
-                <h3 class="text-base mb-4">Booking Overview</h3>
-
-                <div class="divider" />
-
-                <booking-pricing
-                  :currency="currency"
-                  :details="rentDetails"
-                  class="mb-8"
-                  @updated="loading = false"
-                  @error="errorHandle"
-                />
-
-                <button
-                  :class="['button button--primary w-full py-5', { 'btn-disabled': loading || !!error }]"
-                  :disabled="loading || !!error"
-                  @click="handleAddBooking"
-                >
-                  <loading-spinner v-if="loading" />
-                  <div v-else-if="!!error" class="rent-summary__error">{{ error }}</div>
-                  <template v-else>Add to booking</template>
-                </button>
-              </section>
             </div>
           </div>
         </div>
-      </div>
+      </component>
     </template>
   </div>
 </template>
@@ -246,7 +270,7 @@ export default defineComponent({
   position: relative;
 
   .grid {
-    @include breakpoint('lg') {
+    @include breakpoint('xl') {
       grid-template-columns: minmax(400px, 67%) 1fr;
     }
   }
@@ -267,5 +291,51 @@ export default defineComponent({
 
 .btn-disabled {
   cursor: not-allowed;
+}
+
+.rent-action {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: get-theme-color('primary');
+
+  @apply .p-6;
+
+  &__content {
+    color: white;
+    display: flex;
+    justify-content: space-between;
+  }
+}
+.bike-details {
+  @include max-breakpoint('xl') {
+    &--mobile {
+      position: relative;
+
+      @apply .pb-22;
+
+      &::before {
+        content: '';
+        width: 100vw;
+        height: 100%;
+        background-color: get-theme-color('primary');
+        position: absolute;
+        left: -2rem;
+        bottom: -2rem;
+        border-radius: $border-radius-lg $border-radius-lg 0 0;
+        z-index: 0;
+      }
+    }
+
+    &__descrtiption {
+      @apply .mt-3;
+    }
+
+    &__pricing,
+    &__descrtiption,
+    &__location {
+      color: get-theme-color('white');
+    }
+  }
 }
 </style>
