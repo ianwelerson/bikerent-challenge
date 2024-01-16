@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { mockBikeRentDetails, mockedBikeReturnDetails } from '@/mocks'
 
 import { bike } from '@/core/api'
@@ -20,14 +20,23 @@ describe('API module: bike', () => {
     expect(bike.listAvailable()).resolves.toBeInstanceOf(Array)
   })
 
-  it('rents a bikes', async () => {
-    try {
-      await bike.returns(mockedBikeReturnDetails)
-      // eslint-disable-next-line no-empty
-    } catch {}
+  describe('bike rent', () => {
+    beforeEach(async () => {
+      try {
+        await bike.returns(mockedBikeReturnDetails)
+        // eslint-disable-next-line no-empty
+      } catch {}
+    })
 
-    const result = await bike.rent(mockBikeRentDetails)
-    expect(result).toBeInstanceOf(Object)
+    it('get a rent amount', async () => {
+      const result = await bike.amount(mockBikeRentDetails)
+      expect(result).toBeInstanceOf(Object)
+    })
+
+    it('rents a bikes', async () => {
+      const result = await bike.rent(mockBikeRentDetails)
+      expect(result).toBeInstanceOf(Object)
+    })
   })
 
   it('returns a bikes', async () => {

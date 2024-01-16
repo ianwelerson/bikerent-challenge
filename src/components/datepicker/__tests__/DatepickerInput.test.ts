@@ -1,19 +1,41 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
 
 import { DatepickerInput, type SelectedDates } from '@/components/datepicker'
 import { mount } from '@vue/test-utils'
 
-import { formatDate } from '@/core/helpers/date'
+const FAKE_START_DATE = '2024-01-16'
+const FAKE_END_DATE = '2024-01-20'
 
-const startDate = new Date()
-const endDate = new Date()
-endDate.setDate(endDate.getDate() + 5)
+vi.useFakeTimers().setSystemTime(new Date(FAKE_START_DATE))
 
 const selectedDate: SelectedDates = {
-  start: startDate.toISOString().split('T')[0],
-  end: endDate.toISOString().split('T')[0]
+  start: FAKE_START_DATE,
+  end: FAKE_END_DATE
 }
+
+vi.mock('@/composables/screenSize', () => ({
+  useScreenSize: vi
+    .fn()
+    .mockReturnValueOnce({
+      isMobile: true
+    })
+    .mockReturnValueOnce({
+      isMobile: false
+    })
+    .mockReturnValueOnce({
+      isMobile: false
+    })
+    .mockReturnValueOnce({
+      isMobile: false
+    })
+    .mockReturnValueOnce({
+      isMobile: false
+    })
+    .mockReturnValue({
+      isMobile: true
+    })
+}))
 
 describe('DatepickerInput', () => {
   it('renders correctly', async () => {
@@ -29,9 +51,9 @@ describe('DatepickerInput', () => {
 
     await nextTick()
 
-    expect(wrapper.find('.monthday--start').text()).equals(formatDate(selectedDate.start!, 'DD'))
-    expect(wrapper.findAll('.monthday--between')).toHaveLength(4)
-    expect(wrapper.find('.monthday--end').text()).equals(formatDate(selectedDate.end!, 'DD'))
+    expect(wrapper.find('.monthday--start').text()).equals(FAKE_START_DATE.split('-')[2])
+    expect(wrapper.findAll('.monthday--between')).toHaveLength(3)
+    expect(wrapper.find('.monthday--end').text()).equals(FAKE_END_DATE.split('-')[2])
   })
 
   it('should have disabled dates based on the current day', async () => {
@@ -39,25 +61,19 @@ describe('DatepickerInput', () => {
 
     await nextTick()
 
-    expect(wrapper.findAll('.monthday--disabled')).toHaveLength(Number(formatDate(selectedDate.start!, 'DD')) - 1)
+    expect(wrapper.findAll('.monthday--disabled')).toHaveLength(15)
   })
 
   it('should be able to navigate to the next month', async () => {
     const wrapper = mount(DatepickerInput, { props: { modelValue: { ...selectedDate } } })
-    const currentMonth = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0).toLocaleString('en-US', {
-      month: 'long'
-    })
-    const nextMonth = new Date(startDate.getFullYear(), startDate.getMonth() + 2, 0).toLocaleString('en-US', {
-      month: 'long'
-    })
 
     await nextTick()
 
-    expect(wrapper.find('.current-month__label').text()).toBe(currentMonth)
+    expect(wrapper.find('.current-month__label').text()).toBe('January')
 
     await wrapper.find('.navigation__button:not(.navigation__button--disabled)').trigger('click')
 
-    expect(wrapper.find('.current-month__label').text()).toBe(nextMonth)
+    expect(wrapper.find('.current-month__label').text()).toBe('February')
   })
 
   it('should be able to select dates and receive the event', async () => {
@@ -71,19 +87,37 @@ describe('DatepickerInput', () => {
     const startButton = availableDates[availableDates.length - 4]
     const endButton = availableDates[availableDates.length - 1]
 
-    startButton.trigger('click')
-    endButton.trigger('click')
+    await startButton.trigger('click')
+    await endButton.trigger('click')
+
+    expect(wrapper.find('.monthday--start').text()).equals('28')
+    expect(wrapper.find('.monthday--end').text()).equals('31')
+
+    expect((wrapper.emitted()['update:modelValue'][1] as SelectedDates[])[0]).toMatchObject({
+      start: '2024-01-28',
+      end: '2024-01-31'
+    })
+  })
+
+  it('should be able to select dates and trigger the emit when is mobile', async () => {
+    const wrapper = mount(DatepickerInput, { props: { modelValue: { ...selectedDate } } })
 
     await nextTick()
 
-    expect(wrapper.find('.monthday--start').text()).equals(startButton.text())
-    expect(wrapper.find('.monthday--end').text()).equals(endButton.text())
+    const availableDates = wrapper.findAll(
+      '.monthday:not(.monthday--diff-month,.monthday--between,.monthday--start,.monthday--end,.monthday--disabled)'
+    )
+    const startButton = availableDates[availableDates.length - 4]
+    const endButton = availableDates[availableDates.length - 1]
 
-    expect(wrapper.props('modelValue')).toMatchObject({
-      start: new Date(startDate.getFullYear(), startDate.getMonth(), Number(startButton.text()))
-        .toISOString()
-        .split('T')[0],
-      end: new Date(startDate.getFullYear(), startDate.getMonth(), Number(endButton.text())).toISOString().split('T')[0]
+    await startButton.trigger('click')
+    await endButton.trigger('click')
+
+    await wrapper.find('button.button--secondary').trigger('click')
+
+    expect((wrapper.emitted()['update:modelValue'][0] as SelectedDates[])[0]).toMatchObject({
+      start: '2024-01-28',
+      end: '2024-01-31'
     })
   })
 })

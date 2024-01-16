@@ -4,6 +4,8 @@ import type { PropType } from 'vue'
 
 import type { SelectedDates } from './types'
 
+import { useScreenSize } from '@/composables'
+
 import { generateDatepickerDays } from '@/core/helpers/date'
 
 import { Icon } from '@/components/icon'
@@ -37,7 +39,7 @@ export default defineComponent({
       start: null,
       end: null
     } as SelectedDates,
-    currentWidth: window.innerWidth
+    screenSize: useScreenSize()
   }),
   computed: {
     days() {
@@ -52,16 +54,13 @@ export default defineComponent({
       }
 
       return this.month <= new Date().getMonth() + 1
-    },
-    isMobile(): boolean {
-      return this.currentWidth <= 1024
     }
   },
   watch: {
     selected: {
       handler() {
         // If is mobile, we will not do an autoapply
-        if (this.isMobile) {
+        if (this.screenSize.isMobile) {
           return
         }
 
@@ -72,13 +71,6 @@ export default defineComponent({
   },
   mounted() {
     this.selected = { ...this.modelValue }
-
-    this.$nextTick(() => {
-      window.addEventListener('resize', this.onResize)
-    })
-  },
-  beforeUnmount() {
-    window.removeEventListener('resize', this.onResize)
   },
   methods: {
     navigate(direction: 'PREV' | 'NEXT') {
@@ -112,9 +104,6 @@ export default defineComponent({
       }
 
       this.selected.end = date
-    },
-    onResize() {
-      this.currentWidth = window.innerWidth
     },
     emitDate() {
       if (!!this.selected.start && !!this.selected.end) {
@@ -188,7 +177,7 @@ export default defineComponent({
           </div>
         </div>
       </div>
-      <div v-if="isMobile" class="mt-16">
+      <div v-if="screenSize.isMobile" class="mt-16">
         <button class="button button--secondary w-full py-5" @click="emitDate">Select</button>
       </div>
     </div>
