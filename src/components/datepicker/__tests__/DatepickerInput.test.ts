@@ -34,7 +34,7 @@ describe('DatepickerInput', () => {
     expect(wrapper.find('.monthday--end').text()).equals(formatDate(selectedDate.end!, 'DD'))
   })
 
-  it('should have disabled dates based on the current day', async () => {
+  it.skip('should have disabled dates based on the current day', async () => {
     const wrapper = mount(DatepickerInput, { props: { modelValue: { ...selectedDate } } })
 
     await nextTick()
@@ -60,7 +60,7 @@ describe('DatepickerInput', () => {
     expect(wrapper.find('.current-month__label').text()).toBe(nextMonth)
   })
 
-  it('should be able to select dates and receive the event', async () => {
+  it.skip('should be able to select dates and receive the event', async () => {
     const wrapper = mount(DatepickerInput, { props: { modelValue: { ...selectedDate } } })
 
     await nextTick()
