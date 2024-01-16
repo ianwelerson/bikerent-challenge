@@ -28,7 +28,7 @@ export default defineComponent({
 
   <header-layout :is-home="isHome" />
 
-  <main :class="['main container', { 'main--home': isHome }]">
+  <main :class="['main container mx-auto md:px-24', { 'main--home': isHome }]">
     <div class="main__content pt-12">
       <router-view />
     </div>

@@ -1,8 +1,8 @@
 <script lang="ts">
 import { useBikeStore, mapActions, mapState } from '@/core/store'
 import { defineComponent } from 'vue'
-import axios from 'axios'
-import { API_USER_ID } from '@/core/config'
+
+import { API_USER_ID, CurrencyCode } from '@/core/config'
 
 import { useScreenSize } from '@/composables'
 
@@ -10,17 +10,15 @@ import { LoadingSpinner } from '@/components/loading'
 import { BikeImageSelector, BikeSpecs, type BikeSpecsProps, BikePrice, BikeBookmark } from '@/components/bike'
 import { Chip } from '@/components/chip'
 import { ImageLazy } from '@/components/image'
-import { BookingAddressMap, BookingPricing } from '@/components/booking'
-import { CurrencyCode } from '@/core/config'
 
 import { BreadcrumbsLayout } from '@/components/layout'
 import { NotFound } from '@/components/error'
 
 import { DatepickerInput } from '@/components/datepicker'
 import { SwipeModal } from '@/components/swipeModal'
+import { BookingOverview, BookingSuccess, BookingAddressMap } from '@/components/booking'
 
 import type { BikeRentDetails } from '@/core/api/modules/typings/bike'
-import { bike } from '@/core/api'
 
 export default defineComponent({
   name: 'BikeDetailsView',
@@ -32,12 +30,13 @@ export default defineComponent({
     BikePrice,
     Chip,
     BookingAddressMap,
-    BookingPricing,
     BikeBookmark,
     NotFound,
     ImageLazy,
     DatepickerInput,
-    SwipeModal
+    SwipeModal,
+    BookingOverview,
+    BookingSuccess
   },
   metaInfo() {
     const { name } = this.data || {}
@@ -55,9 +54,7 @@ export default defineComponent({
       start: new Date().toISOString().split('T')[0],
       end: new Date().toISOString().split('T')[0]
     },
-    loading: false,
     rentCompleted: false,
-    error: null as string | null,
     screenSize: useScreenSize()
   }),
   computed: {
@@ -97,12 +94,6 @@ export default defineComponent({
       return this.screenSize.isMobile ? 'swipe-modal' : 'div'
     }
   },
-  watch: {
-    date() {
-      this.loading = true
-      this.error = null
-    }
-  },
   async beforeMount() {
     if (!this.data) {
       this.isLoading = true
@@ -112,25 +103,11 @@ export default defineComponent({
   },
   methods: {
     ...mapActions(useBikeStore, { fetchBikeList: 'fetchList' }),
-    async handleAddBooking() {
-      this.loading = true
-
-      try {
-        await bike.rent(this.rentDetails)
-        this.rentCompleted = true
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          this.errorHandle(error.response?.data.message)
-        }
-      } finally {
-        this.loading = false
-      }
-    },
-    errorHandle(message: string | null) {
-      this.error = message
-    },
     backHome() {
       this.$router.push({ name: 'home' })
+    },
+    bookedHandle() {
+      this.rentCompleted = true
     }
   }
 })
@@ -209,21 +186,7 @@ export default defineComponent({
 
           <div v-if="!screenSize.isMobile">
             <div class="card p-8">
-              <template v-if="rentCompleted">
-                <div class="rent-summary">
-                  <div>
-                    <h3 class="mb-6 text-2xl font-extrabold">Thank you!</h3>
-                    <p class="m-0 text-base font-semibold">Your bike is booked.</p>
-                  </div>
-                  <div class="mt-6">
-                    <image-lazy :src="images[0]" class="rent-summary__img" />
-                    <div class="mt-4">
-                      <h2 class="text-lg font-bold">{{ data!.name }}</h2>
-                      <chip color="secondary" size="sm">{{ data!.type }}</chip>
-                    </div>
-                  </div>
-                </div>
-              </template>
+              <booking-success v-if="rentCompleted" :thumb="images[0]" :name="data!.name" :type="data!.type" />
               <div v-else>
                 <section class="">
                   <h3 class="text-2xl font-extrabold mb-2">Select date and time</h3>
@@ -234,27 +197,7 @@ export default defineComponent({
                 </section>
 
                 <section class="mt-5">
-                  <h3 class="text-base mb-4">Booking Overview</h3>
-
-                  <div class="divider" />
-
-                  <booking-pricing
-                    :currency="currency"
-                    :details="rentDetails"
-                    class="mb-8"
-                    @updated="loading = false"
-                    @error="errorHandle"
-                  />
-
-                  <button
-                    :class="['button button--primary w-full py-5', { 'btn-disabled': loading || !!error }]"
-                    :disabled="loading || !!error"
-                    @click="handleAddBooking"
-                  >
-                    <loading-spinner v-if="loading" />
-                    <div v-else-if="!!error" class="rent-summary__error">{{ error }}</div>
-                    <template v-else>Add to booking</template>
-                  </button>
+                  <booking-overview :rent-details="rentDetails" @booked="bookedHandle" />
                 </section>
               </div>
             </div>
@@ -276,23 +219,6 @@ export default defineComponent({
   }
 }
 
-.rent-summary {
-  padding: 39px 0;
-  @apply .text-center;
-
-  &__img {
-    width: 185px;
-  }
-
-  &__error {
-    color: get-theme-color('error');
-  }
-}
-
-.btn-disabled {
-  cursor: not-allowed;
-}
-
 .rent-action {
   position: fixed;
   bottom: 0;
@@ -307,6 +233,7 @@ export default defineComponent({
     justify-content: space-between;
   }
 }
+
 .bike-details {
   @include max-breakpoint('xl') {
     &--mobile {
