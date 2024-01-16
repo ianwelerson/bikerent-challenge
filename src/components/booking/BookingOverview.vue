@@ -4,7 +4,7 @@ import axios from 'axios'
 
 import { CurrencyCode } from '@/core/config'
 
-// import { bike } from '@/core/api'
+import { bike } from '@/core/api'
 import type { BikeRentDetails } from '@/core/api/modules/typings/bike'
 
 import { BookingPricing } from '@/components/booking'
@@ -28,33 +28,28 @@ export default defineComponent({
     isLoading: false,
     error: null as string | null
   }),
-  watch: {
-    isLoading() {
-      this.error = null
-    }
-  },
   methods: {
-    errorHandle(message: string | null) {
-      this.error = message
-    },
     async handleAddBooking() {
-      this.isLoading = true
+      this.loadingData()
 
       try {
-        // await bike.rent(this.rentDetails)
-        await new Promise((resolve) => {
-          setTimeout(() => {
-            resolve(null)
-          }, 3000)
-        })
+        await bike.rent(this.rentDetails)
+
         this.$emit('booked')
       } catch (error) {
         if (axios.isAxiosError(error)) {
-          this.errorHandle(error.response?.data.message)
+          this.updateErrorMessage(error.response?.data.message)
         }
       } finally {
         this.isLoading = false
       }
+    },
+    updateErrorMessage(message: string | null) {
+      this.error = message
+    },
+    loadingData() {
+      this.isLoading = true
+      this.updateErrorMessage(null)
     }
   }
 })
@@ -70,12 +65,13 @@ export default defineComponent({
       :currency="currency"
       :details="rentDetails"
       class="mb-8"
+      @loading="loadingData"
       @updated="isLoading = false"
-      @error="errorHandle"
+      @error="updateErrorMessage"
     />
 
     <button
-      :class="['button button--primary w-full py-5', { 'btn-disabled': isLoading || !!error }]"
+      :class="['button button--primary w-full py-5', { 'btn-error': isLoading || !!error }]"
       :disabled="isLoading || !!error"
       @click="handleAddBooking"
     >
@@ -89,5 +85,9 @@ export default defineComponent({
 <style scoped lang="scss">
 .error-message {
   color: get-theme-color('error');
+}
+
+.btn-error {
+  cursor: not-allowed;
 }
 </style>

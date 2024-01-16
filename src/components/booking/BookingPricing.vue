@@ -21,7 +21,7 @@ export default defineComponent({
       required: true
     }
   },
-  emits: ['updated', 'error'],
+  emits: ['loading', 'updated', 'error'],
   data: () => ({
     subtotal: 0,
     serviceFee: 0,
@@ -40,6 +40,8 @@ export default defineComponent({
       return formatCurrency(value, this.currency)
     },
     async updatePrice() {
+      this.$emit('loading')
+
       try {
         const { rentAmount, fee, totalAmount } = await bike.amount(this.details)
 

@@ -1,0 +1,20 @@
+// Vitest Snapshot v1
+
+exports[`BookingOverview > renders correctly 1`] = `
+"<div data-v-30f699bc=\\"\\">
+  <h3 class=\\"text-base mb-4\\" data-v-30f699bc=\\"\\">Booking Overview</h3>
+  <div class=\\"divider\\" data-v-30f699bc=\\"\\"></div>
+  <section class=\\"booking-pricing mb-8\\" data-v-c7ba2ef4=\\"\\" data-v-30f699bc=\\"\\">
+    <div class=\\"grid grid-cols-2 gap-y-3 text-sm\\" data-v-c7ba2ef4=\\"\\">
+      <div class=\\"flex items-center\\" data-v-c7ba2ef4=\\"\\"> Subtotal <div class=\\"icon text-xs ml-1\\" data-v-6ea13f32=\\"\\" data-v-c7ba2ef4=\\"\\"><em class=\\"fa-solid fa-circle-info\\" data-v-6ea13f32=\\"\\"></em></div>
+      </div>
+      <div class=\\"text-right\\" data-v-c7ba2ef4=\\"\\">0 €</div>
+      <div class=\\"flex items-center\\" data-v-c7ba2ef4=\\"\\"> Service Fee <div class=\\"icon text-xs ml-1\\" data-v-6ea13f32=\\"\\" data-v-c7ba2ef4=\\"\\"><em class=\\"fa-solid fa-circle-info\\" data-v-6ea13f32=\\"\\"></em></div>
+      </div>
+      <div class=\\"text-right\\" data-v-c7ba2ef4=\\"\\">0 €</div>
+      <div class=\\"flex items-center text-base\\" data-v-c7ba2ef4=\\"\\">Total</div>
+      <div class=\\"text-right text-2xl font-bold\\" data-v-c7ba2ef4=\\"\\">0 €</div>
+    </div>
+  </section><button class=\\"button button--primary w-full py-5\\" data-v-30f699bc=\\"\\">Add to booking</button>
+</div>"
+`;
