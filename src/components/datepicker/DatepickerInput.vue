@@ -53,7 +53,9 @@ export default defineComponent({
         return false
       }
 
-      return this.month <= new Date().getMonth() + 1
+      const today = new Date()
+
+      return this.year <= today.getFullYear() && this.month <= today.getMonth() + 1
     }
   },
   watch: {

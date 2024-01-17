@@ -7,7 +7,10 @@ import { mount } from '@vue/test-utils'
 const FAKE_START_DATE = '2024-01-16'
 const FAKE_END_DATE = '2024-01-20'
 
-vi.useFakeTimers().setSystemTime(new Date(FAKE_START_DATE))
+const fakeData = new Date(FAKE_START_DATE)
+fakeData.setHours(12, 0, 0, 0)
+
+vi.useFakeTimers().setSystemTime(new Date(fakeData))
 
 const selectedDate: SelectedDates = {
   start: FAKE_START_DATE,
@@ -61,7 +64,7 @@ describe('DatepickerInput', () => {
 
     await nextTick()
 
-    expect(wrapper.findAll('.monthday--disabled')).toHaveLength(15)
+    expect(wrapper.findAll('.monthday--disabled')).toHaveLength(16)
   })
 
   it('should be able to navigate to the next month', async () => {
