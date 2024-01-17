@@ -139,7 +139,7 @@ export default defineComponent({
 
                 <div v-if="!screenSize.isMobile" class="divider" />
 
-                <article class="bike-details__descrtiption relative">
+                <article class="bike-details__description mt-3 xl:mt-0 relative">
                   <div class="flex">
                     <div>
                       <h2 class="font-extrabold text-2xl mb-1 lg:mb-0 lg:text-4xl">{{ data!.name }}</h2>
@@ -254,12 +254,8 @@ export default defineComponent({
       }
     }
 
-    &__descrtiption {
-      @apply .mt-3;
-    }
-
     &__pricing,
-    &__descrtiption,
+    &__description,
     &__location {
       color: get-theme-color('white');
     }

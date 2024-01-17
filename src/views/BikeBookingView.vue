@@ -30,6 +30,13 @@ export default defineComponent({
     LoadingSpinner,
     BookingSuccess
   },
+  metaInfo() {
+    const { name } = this.data || {}
+
+    return {
+      title: name ? `${name} - Booking - BikeRent Vue` : 'Booking - BikeRent Vue'
+    }
+  },
   data: () => ({
     currency: CurrencyCode.EUR,
     date: {
