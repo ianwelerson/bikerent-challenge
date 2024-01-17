@@ -1,34 +1,60 @@
 <script lang="ts">
-import { PRICING_SERVICE_FEE } from '@/core/config'
 import { defineComponent, type PropType } from 'vue'
+import axios from 'axios'
 import { Icon } from '@/components/icon/'
-import type { CurrencyCode } from '@/core/config'
 import { formatCurrency } from '@/core/helpers/currency'
+import { bike } from '@/core/api'
+
+import type { CurrencyCode } from '@/core/config'
+import type { BikeRentDetails } from '@/core/api/modules/typings/bike'
 
 export default defineComponent({
   name: 'BookingPricing',
   components: { Icon },
   props: {
-    price: {
-      type: Number,
-      required: true
-    },
     currency: {
       type: String as PropType<CurrencyCode>,
       required: true
+    },
+    details: {
+      type: Object as PropType<BikeRentDetails>,
+      required: true
     }
   },
-  computed: {
-    serviceFee(): number {
-      return this.price * PRICING_SERVICE_FEE
-    },
-    total(): number {
-      return this.price + this.serviceFee
+  emits: ['loading', 'updated', 'error'],
+  data: () => ({
+    subtotal: 0,
+    serviceFee: 0,
+    total: 0
+  }),
+  watch: {
+    details() {
+      this.updatePrice()
     }
+  },
+  mounted() {
+    this.updatePrice()
   },
   methods: {
     formatPrice(value: number): String {
       return formatCurrency(value, this.currency)
+    },
+    async updatePrice() {
+      this.$emit('loading')
+
+      try {
+        const { rentAmount, fee, totalAmount } = await bike.amount(this.details)
+
+        this.subtotal = rentAmount
+        this.serviceFee = fee
+        this.total = totalAmount
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          this.$emit('error', error.response?.data.message)
+        }
+      } finally {
+        this.$emit('updated')
+      }
     }
   }
 })
@@ -41,7 +67,7 @@ export default defineComponent({
         Subtotal
         <icon type="solid" size="xs" class="ml-1">circle-info</icon>
       </div>
-      <div class="text-right">{{ formatPrice(price) }}</div>
+      <div class="text-right">{{ formatPrice(subtotal) }}</div>
 
       <div class="flex items-center">
         Service Fee

@@ -39,6 +39,18 @@ export async function listAvailable(): Promise<Bike[]> {
 }
 
 /**
+ * Return amount for a possible rent/booking.
+ *
+ * @param {BikeRentDetails} details
+ * @returns {Promise<BikeRent>}
+ */
+export async function amount(details: BikeRentDetails): Promise<BikeRent> {
+  const { data } = await client.post<BikeRent>('bikes/amount', details)
+
+  return data
+}
+
+/**
  * Rents a bike; you can also book future rents.
  *
  *

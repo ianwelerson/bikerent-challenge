@@ -1,15 +1,23 @@
 <script lang="ts">
 import { useBikeStore, mapActions, mapState } from '@/core/store'
 import { defineComponent } from 'vue'
+import axios from 'axios'
+import { API_USER_ID } from '@/core/config'
 
 import { LoadingSpinner } from '@/components/loading'
 import { BikeImageSelector, BikeSpecs, type BikeSpecsProps, BikePrice, BikeBookmark } from '@/components/bike'
 import { Chip } from '@/components/chip'
+import { ImageLazy } from '@/components/image'
 import { BookingAddressMap, BookingPricing } from '@/components/booking'
 import { CurrencyCode } from '@/core/config'
 
 import { BreadcrumbsLayout } from '@/components/layout'
 import { NotFound } from '@/components/error'
+
+import { DatepickerInput } from '@/components/datepicker'
+
+import type { BikeRentDetails } from '@/core/api/modules/typings/bike'
+import { bike } from '@/core/api'
 
 export default defineComponent({
   name: 'BikeDetailsView',
@@ -23,7 +31,9 @@ export default defineComponent({
     BookingAddressMap,
     BookingPricing,
     BikeBookmark,
-    NotFound
+    NotFound,
+    ImageLazy,
+    DatepickerInput
   },
   metaInfo() {
     const { name } = this.data || {}
@@ -36,7 +46,14 @@ export default defineComponent({
     isLoading: false,
     currency: CurrencyCode.EUR,
     mockAddress: '745 Atlantic Ave, Boston, MA 02111, United States',
-    isBookmarked: false
+    isBookmarked: false,
+    date: {
+      start: new Date().toISOString().split('T')[0],
+      end: new Date().toISOString().split('T')[0]
+    },
+    loading: false,
+    rentCompleted: false,
+    error: null as string | null
   }),
   computed: {
     ...mapState(useBikeStore, ['getBikeById']),
@@ -62,9 +79,22 @@ export default defineComponent({
         maxLoad,
         ratings
       }
+    },
+    rentDetails(): BikeRentDetails {
+      return {
+        bikeId: this.id!, // We can use the non-null assertion operator because if the id is null, the rentDetails will not be used by the component
+        userId: API_USER_ID, // TODO: Get this from the API when we have the login screen implemented
+        dateFrom: this.date.start,
+        dateTo: this.date.end
+      }
     }
   },
-  watch: {},
+  watch: {
+    date() {
+      this.loading = true
+      this.error = null
+    }
+  },
   async beforeMount() {
     if (!this.data) {
       this.isLoading = true
@@ -74,11 +104,22 @@ export default defineComponent({
   },
   methods: {
     ...mapActions(useBikeStore, { fetchBikeList: 'fetchList' }),
-    handleAddBooking() {
-      // TODO: add booking action
+    async handleAddBooking() {
+      this.loading = true
 
-      // eslint-disable-next-line no-console
-      console.log('booking action')
+      try {
+        await bike.rent(this.rentDetails)
+        this.rentCompleted = true
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          this.errorHandle(error.response?.data.message)
+        }
+      } finally {
+        this.loading = false
+      }
+    },
+    errorHandle(message: string | null) {
+      this.error = message
     }
   }
 })
@@ -145,13 +186,54 @@ export default defineComponent({
 
         <div>
           <div class="card p-8">
-            <h3 class="text-base mb-4">Booking Overview</h3>
+            <template v-if="rentCompleted">
+              <div class="rent-summary">
+                <div>
+                  <h3 class="mb-6 text-2xl font-extrabold">Thank you!</h3>
+                  <p class="m-0 text-base font-semibold">Your bike is booked.</p>
+                </div>
+                <div class="mt-6">
+                  <image-lazy :src="images[0]" class="rent-summary__img" />
+                  <div class="mt-4">
+                    <h2 class="text-lg font-bold">{{ data!.name }}</h2>
+                    <chip color="secondary" size="sm">{{ data!.type }}</chip>
+                  </div>
+                </div>
+              </div>
+            </template>
+            <div v-else>
+              <section class="">
+                <h3 class="text-2xl font-extrabold mb-2">Select date and time</h3>
 
-            <div class="divider" />
+                <div class="">
+                  <datepicker-input v-model="date" />
+                </div>
+              </section>
 
-            <booking-pricing :price="data!.rate" :currency="currency" class="mb-8" />
+              <section class="mt-5">
+                <h3 class="text-base mb-4">Booking Overview</h3>
 
-            <button class="button button--primary w-full py-5" @click="handleAddBooking">Add to booking</button>
+                <div class="divider" />
+
+                <booking-pricing
+                  :currency="currency"
+                  :details="rentDetails"
+                  class="mb-8"
+                  @updated="loading = false"
+                  @error="errorHandle"
+                />
+
+                <button
+                  :class="['button button--primary w-full py-5', { 'btn-disabled': loading || !!error }]"
+                  :disabled="loading || !!error"
+                  @click="handleAddBooking"
+                >
+                  <loading-spinner v-if="loading" />
+                  <div v-else-if="!!error" class="rent-summary__error">{{ error }}</div>
+                  <template v-else>Add to booking</template>
+                </button>
+              </section>
+            </div>
           </div>
         </div>
       </div>
@@ -168,5 +250,22 @@ export default defineComponent({
       grid-template-columns: minmax(400px, 67%) 1fr;
     }
   }
+}
+
+.rent-summary {
+  padding: 39px 0;
+  @apply .text-center;
+
+  &__img {
+    width: 185px;
+  }
+
+  &__error {
+    color: get-theme-color('error');
+  }
+}
+
+.btn-disabled {
+  cursor: not-allowed;
 }
 </style>
