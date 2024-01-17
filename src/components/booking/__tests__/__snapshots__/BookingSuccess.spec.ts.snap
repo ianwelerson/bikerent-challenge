@@ -1,0 +1,19 @@
+// Vitest Snapshot v1
+
+exports[`BookingSuccess > renders correctly 1`] = `
+"<div class=\\"rent-success\\" data-v-65a8440a=\\"\\">
+  <div data-v-65a8440a=\\"\\">
+    <h3 class=\\"mb-6 text-2xl font-extrabold\\" data-v-65a8440a=\\"\\">Thank you!</h3>
+    <p class=\\"m-0 text-base font-semibold\\" data-v-65a8440a=\\"\\">Your bike is booked.</p>
+  </div>
+  <div class=\\"mt-6\\" data-v-65a8440a=\\"\\"><img class=\\"image image--lazy rent-success__img\\" data-v-ff3f7011=\\"\\" data-v-65a8440a=\\"\\">
+    <div class=\\"mt-4\\" data-v-65a8440a=\\"\\">
+      <h2 class=\\"text-lg font-bold\\" data-v-65a8440a=\\"\\">Murazik, Thiel and Robel</h2>
+      <div class=\\"chip chip--sm chip--secondary\\" data-v-221b4c58=\\"\\" data-v-65a8440a=\\"\\">
+        <div class=\\"chip__content\\" data-v-221b4c58=\\"\\">Cyclocross Bicycle</div>
+      </div>
+    </div>
+  </div>
+  <!--v-if-->
+</div>"
+`;

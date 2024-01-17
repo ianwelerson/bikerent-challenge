@@ -24,3 +24,14 @@
     }
   }
 }
+
+/// @param {string} $size
+@mixin max-breakpoint($size) {
+  $computedSize: map.get($breakpoints, $size);
+
+  @if ($computedSize) {
+    @media only screen and (max-width: $computedSize){
+      @content;
+    }
+  }
+}

@@ -12,6 +12,11 @@ export default defineComponent({
     return {
       title: 'BikeRent Vue'
     }
+  },
+  computed: {
+    isHome(): boolean {
+      return this.$route.name === 'home'
+    }
   }
 })
 </script>
@@ -21,9 +26,9 @@ export default defineComponent({
     <template #title="{ content }">{{ content }}</template>
   </metainfo>
 
-  <header-layout />
+  <header-layout :is-home="isHome" />
 
-  <main class="main container">
+  <main :class="['main container mx-auto md:px-24', { 'main--home': isHome }]">
     <div class="main__content pt-12">
       <router-view />
     </div>

@@ -10,4 +10,14 @@
   @include element('content') {
     min-height: 275px;
   }
+
+  &--mobile:not(&--home) {
+    background-color: get-theme-color('background');
+    
+    .header__content {
+      @include max-breakpoint('md') {
+        min-height: 0;
+      }
+    }
+  }
 }

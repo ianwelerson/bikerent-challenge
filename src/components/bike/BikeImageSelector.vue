@@ -35,7 +35,7 @@ export default defineComponent({
 
 <template>
   <section v-if="hasImages" class="bike-image-selector">
-    <div class="grid grid-cols-1 gap-8">
+    <div class="bike-image-selector__wrapper grid grid-cols-1 gap-8">
       <div class="bike-image-selector__images">
         <template v-for="(image, i) in images" :key="`image-${i}`">
           <div
@@ -64,7 +64,7 @@ export default defineComponent({
   position: relative;
 
   .grid {
-    @include breakpoint('md') {
+    @include breakpoint('xl') {
       grid-template-columns: 100px 1fr;
     }
   }
@@ -80,6 +80,42 @@ export default defineComponent({
 
     @include modifier('active') {
       border-color: get-theme-color('primary');
+    }
+  }
+
+  &__images {
+    @include max-breakpoint('xl') {
+      order: 1;
+      display: flex;
+      justify-content: center;
+    }
+  }
+
+  &__image {
+    @include max-breakpoint('xl') {
+      width: 8px;
+      height: 8px;
+      background: get-theme-color('gray');
+    }
+
+    @apply .p-0;
+
+    &:not(:first-child, :last-child) {
+      @include max-breakpoint('xl') {
+        @apply .mx-2;
+      }
+    }
+
+    &--active {
+      @include max-breakpoint('xl') {
+        background: get-theme-color('black');
+      }
+    }
+
+    .image--cover {
+      @include max-breakpoint('xl') {
+        display: none;
+      }
     }
   }
 }
